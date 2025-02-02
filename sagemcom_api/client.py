@@ -100,6 +100,15 @@ class SagemcomClient:
         self._session_id = 0
         self._request_id = -1
 
+        if ssl:
+            ssl_context = SSL.create_default_context()
+            if not verify_ssl:
+                ssl_context.check_hostname = False
+                ssl_context.verify_mode = SSL.CERT_NONE
+                # ssl_context.set_ciphers("DEFAULT:@SECLEVEL=1")
+        else:
+            ssl_context = None
+
         self.session = (
             session
             if session
@@ -107,7 +116,7 @@ class SagemcomClient:
                 headers={"User-Agent": f"{DEFAULT_USER_AGENT}"},
                 timeout=ClientTimeout(DEFAULT_TIMEOUT),
                 connector=TCPConnector(
-                    verify_ssl=verify_ssl if verify_ssl is not None else True
+                    ssl_context=ssl_context
                 ),
             )
         )
